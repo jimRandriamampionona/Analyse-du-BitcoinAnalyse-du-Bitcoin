@@ -2,12 +2,12 @@
 
 ## Période analysée
 - Début: 17/09/2014
-- Fin: 26/12/2023
-- Nombre d'observations: 3388
+- Fin: 16/02/2024
+- Nombre d'observations: 3440
 
 ## Formules utilisées
-- SMA: moyenne arithmétique des n valeurs précédentes.
-- EMA: EMA_t = alpha * x_t + (1 - alpha) * EMA_(t-1).
+- SMA: SMA_t = (x_t + x_(t-1) + ... + x_(t-n+1)) / n.
+- EMA: EMA_t = alpha * x_t + (1 - alpha) * EMA_(t-1), avec alpha = 2 / (n + 1).
 
 ## Indicateurs calculés
 - Colonne SMA: `SMA_30`
@@ -15,9 +15,9 @@
 - Rendements journaliers, volatilité annualisée, drawdown et volume moyen.
 
 ## Résultats clés
-- Prix final: 42,520.40 USD
-- Rendement sur la période: 9,197.45%
-- Volatilité annualisée: 70.69%
+- Prix final: 51,841.06 USD
+- Rendement sur la période: 11,235.49%
+- Volatilité annualisée: 70.39%
 - Drawdown maximal: -83.40%
 
 ## Analyse automatique

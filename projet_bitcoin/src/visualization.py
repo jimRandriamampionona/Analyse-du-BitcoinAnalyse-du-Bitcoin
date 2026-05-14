@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
+# Palette centralisée pour garder une identité visuelle cohérente entre toutes
+# les figures du dashboard.
 COLORS = {
     "background": "#05070f",
     "panel": "#0b1020",
@@ -21,6 +23,7 @@ COLORS = {
 
 
 def _apply_dark_layout(fig: go.Figure, title: str, yaxis_title: str = "", height: int = 520) -> go.Figure:
+    """Applique le thème sombre commun à toutes les figures Plotly."""
     fig.update_layout(
         title={"text": title, "x": 0.02, "xanchor": "left", "font": {"size": 22, "color": COLORS["text"]}},
         height=height,
@@ -39,13 +42,18 @@ def _apply_dark_layout(fig: go.Figure, title: str, yaxis_title: str = "", height
             "bgcolor": "rgba(5,7,15,0.45)",
         },
     )
+
+    # Les grilles sont allégées pour conserver une lecture financière propre.
     fig.update_xaxes(showgrid=False)
     fig.update_yaxes(title=yaxis_title, gridcolor=COLORS["grid"], zerolinecolor=COLORS["grid"])
     return fig
 
 
 def create_price_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go.Figure:
+    """Crée la courbe principale comparant prix original, SMA et EMA."""
     fig = go.Figure()
+
+    # Prix original: il sert de référence pour juger l'effet du lissage.
     fig.add_trace(
         go.Scatter(
             x=df["Date"],
@@ -56,6 +64,8 @@ def create_price_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go
             hovertemplate="%{x|%d/%m/%Y}<br>Close: $%{y:,.2f}<extra></extra>",
         )
     )
+
+    # SMA: centre mobile simple, plus stable et plus lent à réagir.
     fig.add_trace(
         go.Scatter(
             x=df["Date"],
@@ -66,6 +76,8 @@ def create_price_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go
             hovertemplate="%{x|%d/%m/%Y}<br>SMA: $%{y:,.2f}<extra></extra>",
         )
     )
+
+    # EMA: centre mobile exponentiel, plus sensible aux prix récents.
     fig.add_trace(
         go.Scatter(
             x=df["Date"],
@@ -76,6 +88,8 @@ def create_price_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go
             hovertemplate="%{x|%d/%m/%Y}<br>EMA: $%{y:,.2f}<extra></extra>",
         )
     )
+
+    # Le sélecteur de période et le range slider rendent l'exploration interactive.
     fig.update_layout(
         xaxis={
             "rangeselector": {
@@ -96,6 +110,7 @@ def create_price_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go
 
 
 def create_sma_focus_chart(df: pd.DataFrame, sma_column: str) -> go.Figure:
+    """Isole la SMA pour montrer son effet de lissage sur le prix."""
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["Date"], y=df["Close"], name="Prix original", line={"color": COLORS["cyan"], "width": 1.7}))
     fig.add_trace(go.Scatter(x=df["Date"], y=df[sma_column], name=sma_column, line={"color": COLORS["violet"], "width": 3}))
@@ -103,6 +118,7 @@ def create_sma_focus_chart(df: pd.DataFrame, sma_column: str) -> go.Figure:
 
 
 def create_ema_focus_chart(df: pd.DataFrame, ema_column: str) -> go.Figure:
+    """Isole l'EMA pour montrer sa réactivité aux variations récentes."""
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["Date"], y=df["Close"], name="Prix original", line={"color": COLORS["cyan"], "width": 1.7}))
     fig.add_trace(go.Scatter(x=df["Date"], y=df[ema_column], name=ema_column, line={"color": COLORS["blue"], "width": 3}))
@@ -110,6 +126,7 @@ def create_ema_focus_chart(df: pd.DataFrame, ema_column: str) -> go.Figure:
 
 
 def create_sma_ema_comparison(df: pd.DataFrame, sma_column: str, ema_column: str) -> go.Figure:
+    """Compare la SMA et l'EMA avec un sous-graphe d'écart EMA moins SMA."""
     fig = make_subplots(
         rows=2,
         cols=1,
@@ -118,9 +135,13 @@ def create_sma_ema_comparison(df: pd.DataFrame, sma_column: str, ema_column: str
         row_heights=[0.72, 0.28],
         subplot_titles=("Comparaison des centres mobiles", "Écart EMA - SMA"),
     )
+
+    # Le premier panneau superpose le prix et les deux centres mobiles.
     fig.add_trace(go.Scatter(x=df["Date"], y=df["Close"], name="Close", line={"color": COLORS["cyan"], "width": 1.5}), row=1, col=1)
     fig.add_trace(go.Scatter(x=df["Date"], y=df[sma_column], name=sma_column, line={"color": COLORS["violet"], "width": 2.5}), row=1, col=1)
     fig.add_trace(go.Scatter(x=df["Date"], y=df[ema_column], name=ema_column, line={"color": COLORS["blue"], "width": 2.5}), row=1, col=1)
+
+    # Le second panneau montre l'avance ou le retard relatif de l'EMA sur la SMA.
     fig.add_trace(
         go.Bar(
             x=df["Date"],
@@ -136,7 +157,10 @@ def create_sma_ema_comparison(df: pd.DataFrame, sma_column: str, ema_column: str
 
 
 def create_volume_chart(df: pd.DataFrame) -> go.Figure:
+    """Affiche le volume journalier et sa moyenne mobile sur 30 jours."""
     fig = go.Figure()
+
+    # Barres de volume pour identifier les périodes d'activité anormale.
     fig.add_trace(
         go.Bar(
             x=df["Date"],
@@ -146,6 +170,8 @@ def create_volume_chart(df: pd.DataFrame) -> go.Figure:
             hovertemplate="%{x|%d/%m/%Y}<br>Volume: %{y:,.0f}<extra></extra>",
         )
     )
+
+    # Moyenne mobile du volume pour lisser les pics isolés.
     fig.add_trace(
         go.Scatter(
             x=df["Date"],
@@ -158,7 +184,10 @@ def create_volume_chart(df: pd.DataFrame) -> go.Figure:
 
 
 def create_volatility_chart(df: pd.DataFrame) -> go.Figure:
+    """Affiche la volatilité annualisée glissante sur 30 jours."""
     fig = go.Figure()
+
+    # La zone remplie rend les phases de risque élevé plus visibles.
     fig.add_trace(
         go.Scatter(
             x=df["Date"],
@@ -174,7 +203,10 @@ def create_volatility_chart(df: pd.DataFrame) -> go.Figure:
 
 
 def create_candlestick_chart(df: pd.DataFrame, sma_column: str, ema_column: str) -> go.Figure:
+    """Construit une lecture OHLC complétée par les deux centres mobiles."""
     fig = go.Figure()
+
+    # Les chandeliers résument open, high, low et close pour chaque séance.
     fig.add_trace(
         go.Candlestick(
             x=df["Date"],
@@ -187,6 +219,9 @@ def create_candlestick_chart(df: pd.DataFrame, sma_column: str, ema_column: str)
             decreasing_line_color=COLORS["red"],
         )
     )
+
+    # Les deux centres mobiles sont ajoutés au graphique OHLC pour relier la
+    # lecture financière classique à la méthode de lissage du projet.
     fig.add_trace(go.Scatter(x=df["Date"], y=df[sma_column], name=sma_column, line={"color": COLORS["violet"], "width": 1.8}))
     fig.add_trace(go.Scatter(x=df["Date"], y=df[ema_column], name=ema_column, line={"color": COLORS["blue"], "width": 1.8}))
     return _apply_dark_layout(fig, "Lecture financière OHLC avec centres mobiles", "Prix USD", height=560)

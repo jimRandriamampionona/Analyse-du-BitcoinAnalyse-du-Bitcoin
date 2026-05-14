@@ -8,22 +8,29 @@ import pandas as pd
 
 @dataclass(frozen=True)
 class TrendInsight:
+    """Structure utilisée pour afficher une interprétation lisible dans le dashboard."""
+
     title: str
     status: str
     description: str
 
 
 def compute_kpis(df: pd.DataFrame) -> dict[str, object]:
+    """Calcule les indicateurs financiers synthétiques de la période sélectionnée."""
     if df.empty:
         return {}
 
+    # Rendement global entre le premier et le dernier prix de clôture.
     first_close = float(df["Close"].iloc[0])
     latest_close = float(df["Close"].iloc[-1])
     period_return = (latest_close / first_close) - 1 if first_close else np.nan
+
+    # La volatilité est annualisée avec une base de 365 jours, adaptée au Bitcoin.
     annualized_volatility = float(df["Daily_Return"].std() * np.sqrt(365))
     max_drawdown = float(df["Drawdown"].min())
     average_volume = float(df["Volume"].mean())
 
+    # Identification des journées extrêmes pour enrichir le rapport automatique.
     best_idx = df["Daily_Return"].idxmax()
     worst_idx = df["Daily_Return"].idxmin()
 
@@ -43,15 +50,22 @@ def compute_kpis(df: pd.DataFrame) -> dict[str, object]:
 
 
 def descriptive_statistics(df: pd.DataFrame) -> pd.DataFrame:
+    """Produit un tableau de statistiques descriptives pour la soutenance."""
     columns = ["Close", "Volume", "Daily_Return", "Volatility_30D", "Price_Range", "Drawdown"]
     available_columns = [column for column in columns if column in df.columns]
+
+    # Les métriques couvrent niveau, dispersion et valeurs extrêmes.
     stats = df[available_columns].agg(["count", "mean", "median", "std", "min", "max"]).T
     stats = stats.reset_index().rename(columns={"index": "Variable"})
     return stats
 
 
 def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[str, object]:
+    """Interprète automatiquement la tendance à partir du prix, de la SMA et de l'EMA."""
     required = ["Close", "Daily_Return", "Volatility_30D", sma_column, ema_column]
+
+    # Les premières lignes peuvent contenir des valeurs manquantes, car les
+    # centres mobiles nécessitent une fenêtre complète avant d'être exploitables.
     valid = df.dropna(subset=[column for column in required if column in df.columns]).copy()
 
     if valid.empty:
@@ -73,11 +87,15 @@ def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[s
     sma = float(latest[sma_column])
     ema = float(latest[ema_column])
 
+    # Le momentum sur 30 jours compare le niveau actuel au passé récent.
     lookback = min(30, len(valid) - 1)
     close_momentum = (close / float(valid["Close"].iloc[-lookback - 1])) - 1 if lookback else 0
+
+    # Les pentes de SMA et EMA mesurent l'orientation des deux centres mobiles.
     sma_slope = (sma / float(valid[sma_column].iloc[-lookback - 1])) - 1 if lookback else 0
     ema_slope = (ema / float(valid[ema_column].iloc[-lookback - 1])) - 1 if lookback else 0
 
+    # Score directionnel volontairement simple pour rester explicable.
     score = 0
     score += 1 if close > sma else -1
     score += 1 if close > ema else -1
@@ -95,6 +113,7 @@ def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[s
         label = "Tendance mixte"
         trend_text = "Les signaux sont partagés; la méthode des centres mobiles indique une zone de transition."
 
+    # La volatilité récente est comparée à son régime médian sur la période.
     volatility_latest = float(valid["Volatility_30D"].iloc[-1])
     volatility_median = float(valid["Volatility_30D"].median())
     if volatility_latest > volatility_median * 1.25:
@@ -107,6 +126,8 @@ def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[s
         volatility_status = "Normale"
         volatility_text = "La volatilité récente reste proche de son régime médian."
 
+    # L'effet du lissage mesure la réduction de variabilité entre le prix original
+    # et chaque centre mobile.
     close_vol = valid["Close"].pct_change().std()
     sma_vol = valid[sma_column].pct_change().std()
     ema_vol = valid[ema_column].pct_change().std()
@@ -115,8 +136,11 @@ def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[s
 
     sma_gap = ((valid["Close"] - valid[sma_column]).abs() / valid["Close"]).mean()
     ema_gap = ((valid["Close"] - valid[ema_column]).abs() / valid["Close"]).mean()
+
+    # Le centre mobile le plus proche du prix est considéré comme le plus réactif.
     responsive = "EMA" if ema_gap < sma_gap else "SMA"
 
+    # Les insights sont structurés pour être affichés sous forme de cartes.
     insights = [
         TrendInsight("Signal global", label, trend_text),
         TrendInsight(
@@ -132,6 +156,8 @@ def analyze_trends(df: pd.DataFrame, sma_column: str, ema_column: str) -> dict[s
         TrendInsight("Volatilité", volatility_status, volatility_text),
     ]
 
+    # La conclusion résume le rôle complémentaire des deux méthodes:
+    # SMA pour la tendance de fond, EMA pour la réaction aux mouvements récents.
     conclusion = (
         f"Conclusion automatique: la méthode des centres mobiles indique une {label.lower()} "
         f"sur la période étudiée. La SMA fournit une lecture plus lissée de la tendance de fond, "
@@ -161,6 +187,7 @@ def build_markdown_report(
     sma_column: str,
     ema_column: str,
 ) -> str:
+    """Génère le rapport Markdown exportable depuis le dashboard."""
     start_date = df["Date"].min().strftime("%d/%m/%Y")
     end_date = df["Date"].max().strftime("%d/%m/%Y")
     insights = trend_analysis.get("insights", [])
@@ -176,8 +203,8 @@ def build_markdown_report(
 - Nombre d'observations: {kpis.get("observations", 0)}
 
 ## Formules utilisées
-- SMA: moyenne arithmétique des n valeurs précédentes.
-- EMA: EMA_t = alpha * x_t + (1 - alpha) * EMA_(t-1).
+- SMA: SMA_t = (x_t + x_(t-1) + ... + x_(t-n+1)) / n.
+- EMA: EMA_t = alpha * x_t + (1 - alpha) * EMA_(t-1), avec alpha = 2 / (n + 1).
 
 ## Indicateurs calculés
 - Colonne SMA: `{sma_column}`

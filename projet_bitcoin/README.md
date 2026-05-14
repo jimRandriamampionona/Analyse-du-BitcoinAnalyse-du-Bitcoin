@@ -1,6 +1,7 @@
 # Analyse du Bitcoin par la méthode des centres mobiles
 
 Projet universitaire complet en Data Science avec Streamlit, Pandas, NumPy et Plotly.
+Le code source est commenté de manière professionnelle pour faciliter la soutenance et la maintenance.
 
 ## Objectif
 
@@ -16,21 +17,21 @@ Analyser l'évolution du Bitcoin à partir du fichier `BTC-USD.csv` en appliquan
 
 ```text
 projet_bitcoin/
-├── app.py
-├── BTC-USD.csv
-├── requirements.txt
-├── README.md
-├── src/
-│   ├── preprocessing.py
-│   ├── indicators.py
-│   ├── visualization.py
-│   ├── analysis.py
-│   └── utils.py
-├── outputs/
-│   ├── figures/
-│   └── reports/
-└── assets/
-    └── style.css
+|-- app.py
+|-- BTC-USD.csv
+|-- requirements.txt
+|-- README.md
+|-- src/
+|   |-- preprocessing.py
+|   |-- indicators.py
+|   |-- visualization.py
+|   |-- analysis.py
+|   |-- utils.py
+|-- outputs/
+|   |-- figures/
+|   |-- reports/
+|-- assets/
+|   |-- style.css
 ```
 
 ## Installation
@@ -73,13 +74,14 @@ Dans l'interface, la section **Source des données** se trouve en haut de la sid
 La SMA calcule la moyenne arithmétique des `n` valeurs précédentes:
 
 ```text
-SMA_t = moyenne des n valeurs précédentes
+SMA_t = (x_t + x_(t-1) + ... + x_(t-n+1)) / n
 ```
 
 L'EMA donne plus de poids aux observations récentes:
 
 ```text
 EMA_t = alpha * x_t + (1 - alpha) * EMA_(t-1)
+alpha = 2 / (n + 1)
 ```
 
 La comparaison SMA vs EMA permet de distinguer la tendance de fond et la réactivité aux mouvements récents du Bitcoin.

@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
+/* Variables globales du thème sombre finance et data analytics. */
 :root {
   --bg: #05070f;
   --panel: rgba(15, 23, 42, 0.72);
@@ -14,10 +15,12 @@
   --red: #fb7185;
 }
 
+/* Typographie globale de l'application Streamlit. */
 html, body, [class*="css"] {
   font-family: "Inter", "Segoe UI", sans-serif;
 }
 
+/* Arrière-plan principal avec profondeur visuelle discrète. */
 .stApp {
   color: var(--text);
   background:
@@ -26,23 +29,27 @@ html, body, [class*="css"] {
     var(--bg);
 }
 
+/* Sidebar de contrôle: paramètres, source CSV et qualité des données. */
 section[data-testid="stSidebar"] {
   background: rgba(2, 6, 23, 0.92);
   border-right: 1px solid var(--border);
 }
 
+/* Harmonisation des textes internes de la sidebar. */
 section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p,
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] span {
   color: var(--text);
 }
 
+/* Conteneur principal adapté aux écrans larges. */
 .main .block-container {
   max-width: 1440px;
   padding-top: 1.3rem;
   padding-bottom: 2rem;
 }
 
+/* En-tête principal du dashboard. */
 .hero-panel {
   position: relative;
   padding: 28px 30px;
@@ -55,6 +62,7 @@ section[data-testid="stSidebar"] span {
   animation: fadeUp 620ms ease both;
 }
 
+/* Couche lumineuse légère pour renforcer l'effet glassmorphism. */
 .hero-panel::before {
   content: "";
   position: absolute;
@@ -63,11 +71,13 @@ section[data-testid="stSidebar"] span {
   pointer-events: none;
 }
 
+/* Contenu placé au-dessus de la couche visuelle du hero. */
 .hero-content {
   position: relative;
   z-index: 1;
 }
 
+/* Libellé court placé au-dessus du titre principal. */
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -83,6 +93,7 @@ section[data-testid="stSidebar"] span {
   letter-spacing: 0;
 }
 
+/* Titre principal de la soutenance. */
 .hero-title {
   margin: 0;
   color: #f8fbff;
@@ -92,6 +103,7 @@ section[data-testid="stSidebar"] span {
   letter-spacing: 0;
 }
 
+/* Texte d'introduction sous le titre principal. */
 .hero-subtitle {
   max-width: 860px;
   margin: 16px 0 0;
@@ -100,6 +112,7 @@ section[data-testid="stSidebar"] span {
   line-height: 1.65;
 }
 
+/* Cartes KPI affichant les indicateurs financiers clés. */
 .metric-card {
   min-height: 126px;
   padding: 18px 18px 16px;
@@ -111,6 +124,7 @@ section[data-testid="stSidebar"] span {
   animation: fadeUp 520ms ease both;
 }
 
+/* Libellé des cartes KPI. */
 .metric-label {
   color: var(--muted);
   font-size: 0.78rem;
@@ -119,6 +133,7 @@ section[data-testid="stSidebar"] span {
   letter-spacing: 0;
 }
 
+/* Valeur principale des cartes KPI. */
 .metric-value {
   margin-top: 10px;
   color: #f8fafc;
@@ -128,6 +143,7 @@ section[data-testid="stSidebar"] span {
   word-break: break-word;
 }
 
+/* Variation ou contexte complémentaire dans les cartes KPI. */
 .metric-delta {
   display: inline-flex;
   margin-top: 10px;
@@ -139,6 +155,7 @@ section[data-testid="stSidebar"] span {
   font-weight: 700;
 }
 
+/* Cartes d'interprétation automatique de la tendance. */
 .analysis-card {
   min-height: 182px;
   padding: 18px;
@@ -148,6 +165,7 @@ section[data-testid="stSidebar"] span {
   box-shadow: 0 16px 46px rgba(0, 0, 0, 0.20);
 }
 
+/* Titre d'une carte d'analyse automatique. */
 .analysis-title {
   color: #f8fafc;
   font-size: 1rem;
@@ -155,6 +173,7 @@ section[data-testid="stSidebar"] span {
   margin-bottom: 8px;
 }
 
+/* Badge textuel indiquant le statut de l'analyse. */
 .analysis-status {
   display: inline-flex;
   padding: 5px 9px;
@@ -167,12 +186,14 @@ section[data-testid="stSidebar"] span {
   font-weight: 800;
 }
 
+/* Description détaillée de l'analyse automatique. */
 .analysis-text {
   color: #cbd5e1;
   font-size: 0.95rem;
   line-height: 1.56;
 }
 
+/* Encadré des formules SMA et EMA dans l'interface. */
 .formula-box {
   padding: 16px 18px;
   border: 1px solid rgba(139, 92, 246, 0.26);
@@ -182,6 +203,7 @@ section[data-testid="stSidebar"] span {
   font-weight: 700;
 }
 
+/* Bloc de marque placé en haut de la sidebar. */
 .sidebar-brand {
   padding: 16px;
   margin-bottom: 16px;
@@ -203,6 +225,7 @@ section[data-testid="stSidebar"] span {
   font-size: 0.82rem;
 }
 
+/* Badge sobre pour indiquer l'état de validation du CSV. */
 .quality-badge {
   display: inline-flex;
   align-items: center;
@@ -215,6 +238,7 @@ section[data-testid="stSidebar"] span {
   font-weight: 800;
 }
 
+/* Encadrement visuel des graphiques Plotly. */
 div[data-testid="stPlotlyChart"] {
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -223,10 +247,12 @@ div[data-testid="stPlotlyChart"] {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
 }
 
+/* Espacement des onglets Streamlit. */
 .stTabs [data-baseweb="tab-list"] {
   gap: 8px;
 }
 
+/* Style des onglets inactifs. */
 .stTabs [data-baseweb="tab"] {
   border-radius: 999px;
   padding: 10px 16px;
@@ -234,10 +260,12 @@ div[data-testid="stPlotlyChart"] {
   border: 1px solid var(--border);
 }
 
+/* Style de l'onglet actif. */
 .stTabs [aria-selected="true"] {
   background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(139, 92, 246, 0.24));
 }
 
+/* Boutons principaux et boutons d'export. */
 button[kind="primary"], .stDownloadButton button {
   border: 1px solid rgba(34, 211, 238, 0.36);
   border-radius: 12px;
@@ -247,6 +275,7 @@ button[kind="primary"], .stDownloadButton button {
   box-shadow: 0 14px 34px rgba(14, 165, 233, 0.18);
 }
 
+/* Animation d'apparition légère des blocs principaux. */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -258,6 +287,7 @@ button[kind="primary"], .stDownloadButton button {
   }
 }
 
+/* Ajustements pour les écrans mobiles. */
 @media (max-width: 768px) {
   .hero-panel {
     padding: 22px 18px;
